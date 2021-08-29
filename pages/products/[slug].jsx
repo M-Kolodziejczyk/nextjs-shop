@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useStore from "../../store";
 import { gql } from "@apollo/client";
 import client from "../../apollo-client";
@@ -11,6 +11,8 @@ import Layout from "../../components/layout";
 export default function Product({ product }) {
   const [quantity, setQuantity] = useState(1);
   const addProductToCart = useStore((state) => state.addProductToCart);
+  const clearAddedProduct = useStore((state) => state.clearAddedProduct);
+  const addedProduct = useStore((state) => state.addedProduct);
 
   function handleSubmit(product) {
     product.quantity = quantity;
@@ -30,6 +32,15 @@ export default function Product({ product }) {
       setQuantity(quantity - 1);
     }
   }
+
+  useEffect(() => {
+    if (addedProduct) {
+      const interval = setInterval(() => {
+        clearAddedProduct();
+      }, 1500);
+      return () => clearInterval(interval);
+    }
+  }, [addedProduct, clearAddedProduct]);
 
   return (
     <Layout title={product.name} description={product.description}>
@@ -79,7 +90,16 @@ export default function Product({ product }) {
               <Button callback={() => handleSubmit(product)}>Buy</Button>
             </div>
           </div>
-          <p className="text-xl mt-5 text-justify sm:max-w-lg md:max-w-full">
+          <div>
+            {addedProduct.id === product.id ? (
+              <p className="text-green-500 transition duration-300 ease-in-out">
+                Item has been added to your cart.
+              </p>
+            ) : (
+              <p className="opacity-0">i</p>
+            )}
+          </div>
+          <p className="text-xl text-justify sm:max-w-lg md:max-w-full">
             {product.description}
           </p>
         </div>

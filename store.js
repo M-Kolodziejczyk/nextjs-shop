@@ -3,6 +3,10 @@ import { devtools } from "zustand/middleware";
 
 const store = (set) => ({
   cart: [],
+  addedProduct: {
+    id: "",
+  },
+
   addProductToCart: (product) =>
     set((state) => {
       let item = state.cart.findIndex((item) => item.id === product.id);
@@ -16,14 +20,26 @@ const store = (set) => ({
                 }
               : productItem
           ),
+          addedProduct: {
+            id: product.id,
+          },
         };
       } else {
-        return { cart: [...state.cart, product] };
+        return {
+          cart: [...state.cart, product],
+          addedProduct: {
+            id: product.id,
+          },
+        };
       }
     }),
   removeProductFromCart: (product) =>
     set((state) => ({
       cart: state.cart.filter((item) => item.id !== product.id),
+    })),
+  clearAddedProduct: () =>
+    set(() => ({
+      addedProduct: {},
     })),
 });
 
